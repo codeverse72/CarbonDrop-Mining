@@ -1,0 +1,6 @@
+{
+  "name": "CarbonDrop - Telegram Mining Bot",
+  "description": "Sleek, dark-themed crypto mining dashboard and Telegram Mini App for CarbonDrop. Mine $CARB tokens, upgrade quantum fullerene rigs, claim yields, and track airdrop eligibility.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
