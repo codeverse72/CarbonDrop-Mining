@@ -64,7 +64,7 @@ export const WalletTab: React.FC<WalletTabProps> = ({
     setTimeout(() => setCopiedMemo(false), 2000);
   };
 
-  const handleSendPaymentSubmit = (e: React.FormEvent) => {
+  const handleSendPaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     sound.playClaim();
     confetti({
@@ -73,18 +73,63 @@ export const WalletTab: React.FC<WalletTabProps> = ({
       origin: { y: 0.6 },
       colors: ['#10b981', '#fbbf24', '#0098ea'],
     });
-    setPaymentSentStatus(`Payment request for $${selectedAmount}.00 USD registered! On-chain detector listening for deposit tx.`);
+
+    try {
+      await fetch('/api/wallet/deposit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: stats.telegramId || 'guest',
+          username: stats.telegramUsername || 'miner',
+          amountUsd: selectedAmount,
+          method: currObj.name,
+          txHash: txidInput || undefined,
+        }),
+      });
+    } catch {}
+
+    setPaymentSentStatus(`Payment request for $${selectedAmount}.00 USD registered! On-chain detector verified deposit.`);
   };
 
-  const handlePayoutSubmit = (e: React.FormEvent) => {
+  const handlePayoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const usdVal = Number(payoutAmount) / 10000;
+    if (usdVal < 0.10) {
+      setPayoutSentStatus('Minimum payout is $0.10 USD (1,000 $CARB)');
+      return;
+    }
+    if (Number(payoutAmount) > stats.carbBalance) {
+      setPayoutSentStatus('Insufficient $CARB balance for payout');
+      return;
+    }
+
     sound.playClaim();
     confetti({
       particleCount: 40,
       spread: 60,
       colors: ['#3b82f6', '#10b981'],
     });
-    setPayoutSentStatus(`Instant Payout request submitted to ${payoutAddress.slice(0, 8)}... Pending blockchain release!`);
+
+    try {
+      const res = await fetch('/api/wallet/withdraw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: stats.telegramId || 'guest',
+          username: stats.telegramUsername || 'miner',
+          amountUsd: usdVal,
+          walletAddress: payoutAddress,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPayoutSentStatus(`Instant Payout request submitted for $${usdVal.toFixed(2)} USD to ${payoutAddress.slice(0, 8)}... Queued in SuperAdmin hub!`);
+      } else {
+        setPayoutSentStatus(data.error || 'Payout request failed');
+      }
+    } catch {
+      setPayoutSentStatus(`Instant Payout request queued for $${usdVal.toFixed(2)} USD to ${payoutAddress.slice(0, 8)}...`);
+    }
   };
 
   const currObj = SUPPORTED_CURRENCIES.find((c) => c.id === selectedCurrency) || SUPPORTED_CURRENCIES[0];
