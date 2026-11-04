@@ -7,7 +7,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // Default environment variables
 const defaultUrl = import.meta.env?.VITE_SUPABASE_URL || 'https://oznjnabbtntkudblobyy.supabase.co';
-const defaultKey = import.meta.env?.VITE_SUPABASE_ANON_KEY || '';
+const defaultKey = import.meta.env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96bmpuYWJidG50a3VkYmxvYnl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzODgzMDksImV4cCI6MjEwODk2NDMwOX0.034jmpPLYazLGz5NlgEVjVZttHHQpQ6RLRBoNJRmQUI';
 
 let supabaseInstance: SupabaseClient | null = null;
 
