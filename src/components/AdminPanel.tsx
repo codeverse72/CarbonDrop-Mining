@@ -37,24 +37,24 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
     'overview' | 'users' | 'deposits' | 'withdrawals' | 'broadcast' | 'tasks' | 'links' | 'settings'
   >('broadcast');
 
-  // Stats state
+  // Stats state - all zeros until loaded from API
   const [stats, setStats] = useState({
-    totalUsers: 5702,
-    joinedToday: 1331,
-    onlineActive: 432,
-    online24h: 1701,
-    treasuryBalance: 132.36,
-    pendingPayouts: 50,
-    deliveredCount: 4596,
-    blockedCount: 1088,
-    totalAudience: 5684,
-    deliveryRate: 80.9,
-    failureRate: 19.1,
-    lastSent: '11/2/2026, 8:04:15 PM',
-    lastSyncPostId: '#5874',
-    lastChecked: '8:05:14 PM',
-    sourceChannel: 'https://t.me/OKPumpWithdrawals',
-    targetChannel: '@CarbonDropPayouts',
+    totalUsers: 0,
+    joinedToday: 0,
+    onlineActive: 0,
+    online24h: 0,
+    treasuryBalance: 0,
+    pendingPayouts: 0,
+    deliveredCount: 0,
+    blockedCount: 0,
+    totalAudience: 0,
+    deliveryRate: 0,
+    failureRate: 0,
+    lastSent: 'Never',
+    lastSyncPostId: '-',
+    lastChecked: '-',
+    sourceChannel: '',
+    targetChannel: '',
     autoCheckEvery45s: true,
   });
 
@@ -80,43 +80,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncToast, setSyncToast] = useState<string | null>(null);
 
-  // Withdrawals list
-  const [withdrawals, setWithdrawals] = useState<any[]>([
-    { id: 'W-9021', userId: '8441612063', username: 'stech112233', amount: 12.5, wallet: 'UQBn81XzQ82Fq', time: '4m ago', status: 'Pending' },
-    { id: 'W-9022', userId: '8823265955', username: 'taskycs', amount: 45.0, wallet: 'EQDF33Klm31aB', time: '12m ago', status: 'Pending' },
-    { id: 'W-9023', userId: '892401831', username: 'alex_crypto_ton', amount: 8.2, wallet: 'UQCc19Pqz49kL', time: '18m ago', status: 'Pending' },
-    { id: 'W-9024', userId: '710294182', username: 'ton_whale_king', amount: 25.0, wallet: 'EQAw44Ztr12vM', time: '35m ago', status: 'Pending' },
-    { id: 'W-9025', userId: '659102834', username: 'elena_sol_miner', amount: 5.0, wallet: 'UQAz88Vbn99rP', time: '52m ago', status: 'Pending' },
-    { id: 'W-9026', userId: '540192847', username: 'quantum_digger_x', amount: 15.0, wallet: 'EQBi77Hjk55wQ', time: '1h ago', status: 'Pending' },
-  ]);
+  // Withdrawals list - loaded from API
+  const [withdrawals, setWithdrawals] = useState<any[]>([]);
 
-  // Deposits list
-  const [deposits, setDeposits] = useState<any[]>([
-    { id: 'DEP-841', userId: '8441612063', username: 'stech112233', amount: 50.0, method: 'USDT (TRC20)', tx: '9a8b11c4728d193fa', time: '2m ago', status: 'Confirmed' },
-    { id: 'DEP-840', userId: '892401831', username: 'alex_crypto_ton', amount: 15.0, method: 'TON', tx: 'c5d290fa88e1742a', time: '8m ago', status: 'Confirmed' },
-    { id: 'DEP-839', userId: '710294182', username: 'ton_whale_king', amount: 20.0, method: 'USDT (TON)', tx: '31f009bcaa924711', time: '19m ago', status: 'Confirmed' },
-    { id: 'DEP-838', userId: '8823265955', username: 'taskycs', amount: 15.0, method: 'TON', tx: '77bb9302fa554901', time: '31m ago', status: 'Confirmed' },
-  ]);
+  // Deposits list - loaded from API
+  const [deposits, setDeposits] = useState<any[]>([]);
 
-  // Tasks list
-  const [taskList, setTaskList] = useState<any[]>([
-    { id: 'T1', name: 'Join Official Channel', reward: '+5,000 CARB', completions: '5,420 / 5,702', active: true },
-    { id: 'T2', name: 'Follow X / Twitter', reward: '+4,000 CARB', completions: '4,109 / 5,702', active: true },
-    { id: 'T3', name: 'Connect TON Wallet', reward: '+10,000 CARB', completions: '3,840 / 5,702', active: true },
-    { id: 'T4', name: 'Invite 3 Active Friends', reward: '+15,000 CARB', completions: '2,190 / 5,702', active: true },
-    { id: 'T5', name: 'Activate Turbo Overclock', reward: '+8,000 CARB', completions: '3,110 / 5,702', active: true },
-  ]);
+  // Tasks list - loaded from API
+  const [taskList, setTaskList] = useState<any[]>([]);
   const [newTaskName, setNewTaskName] = useState('');
   const [newTaskReward, setNewTaskReward] = useState('+5,000 CARB');
   const [isAddingTask, setIsAddingTask] = useState(false);
 
-  // Tracking links
-  const [linksList, setLinksList] = useState<any[]>([
-    { id: 'L1', tag: 'tg_ads_main', channel: 'Telegram Ads', clicks: 28410, signups: 3240, conv: '11.4%' },
-    { id: 'L2', tag: 'youtube_promo_1', channel: 'Crypto Reviewer YT', clicks: 14200, signups: 1620, conv: '11.4%' },
-    { id: 'L3', tag: 'airdrop_hub', channel: 'Airdrop Aggregator', clicks: 8490, signups: 742, conv: '8.7%' },
-    { id: 'L4', tag: 'x_influencer_ton', channel: 'X / Twitter TON Bull', clicks: 3910, signups: 410, conv: '10.5%' },
-  ]);
+  // Tracking links - loaded from API
+  const [linksList, setLinksList] = useState<any[]>([]);
   const [newLinkTag, setNewLinkTag] = useState('');
   const [newLinkChannel, setNewLinkChannel] = useState('');
   const [isAddingLink, setIsAddingLink] = useState(false);
@@ -135,23 +112,121 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      loadRealMinersFromSupabase();
-      loadConfigFromSupabase();
+      loadAllDataFromApi();
       checkDatabaseHealth();
     }
   }, [isAuthenticated]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const BACKEND = 'https://carbondrop-mining.onrender.com';
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('carbondrop_admin_token');
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+  };
+
+  // Load ALL data from backend API (no hardcoded values)
+  const loadAllDataFromApi = async () => {
+    await Promise.all([
+      loadRealMinersFromSupabase(),
+      loadStatsFromApi(),
+      loadWithdrawalsFromApi(),
+      loadDepositsFromApi(),
+      loadTasksFromApi(),
+      loadLinksFromApi(),
+      loadConfigFromSupabase(),
+    ]);
+  };
+
+  const loadStatsFromApi = async () => {
+    try {
+      const res = await fetch(`${BACKEND}/api/admin/stats`, { headers: getAuthHeaders() });
+      if (!res.ok) return;
+      const d = await res.json();
+      setStats(prev => ({
+        ...prev,
+        totalUsers: d.totalPlayers ?? prev.totalUsers,
+        joinedToday: d.joinedToday ?? prev.joinedToday,
+        onlineActive: d.onlineNow ?? prev.onlineActive,
+        online24h: d.online24h ?? prev.online24h,
+        treasuryBalance: d.treasuryBalance ?? prev.treasuryBalance,
+        pendingPayouts: d.pendingPayoutsCount ?? prev.pendingPayouts,
+        deliveredCount: d.broadcastStats?.deliveredCount ?? prev.deliveredCount,
+        blockedCount: d.broadcastStats?.blockedCount ?? prev.blockedCount,
+        totalAudience: d.broadcastStats?.totalAudience ?? prev.totalAudience,
+        deliveryRate: d.broadcastStats?.deliveryRate ?? prev.deliveryRate,
+        failureRate: d.broadcastStats?.failureRate ?? prev.failureRate,
+        lastSent: d.broadcastStats?.lastSent ?? prev.lastSent,
+        sourceChannel: d.mirrorSettings?.sourceChannel ?? prev.sourceChannel,
+        targetChannel: d.mirrorSettings?.targetChannel ?? prev.targetChannel,
+        lastSyncPostId: d.mirrorSettings?.lastSyncPostId ?? prev.lastSyncPostId,
+        lastChecked: d.mirrorSettings?.lastChecked ?? prev.lastChecked,
+      }));
+    } catch (err) {
+      console.warn('Stats load error:', err);
+    }
+  };
+
+  const loadWithdrawalsFromApi = async () => {
+    try {
+      const res = await fetch(`${BACKEND}/api/admin/withdrawals`, { headers: getAuthHeaders() });
+      if (!res.ok) return;
+      const d = await res.json();
+      if (Array.isArray(d.withdrawals)) setWithdrawals(d.withdrawals);
+    } catch {}
+  };
+
+  const loadDepositsFromApi = async () => {
+    try {
+      const res = await fetch(`${BACKEND}/api/admin/deposits`, { headers: getAuthHeaders() });
+      if (!res.ok) return;
+      const d = await res.json();
+      if (Array.isArray(d.deposits)) setDeposits(d.deposits);
+    } catch {}
+  };
+
+  const loadTasksFromApi = async () => {
+    try {
+      const res = await fetch(`${BACKEND}/api/admin/tasks`, { headers: getAuthHeaders() });
+      if (!res.ok) return;
+      const d = await res.json();
+      if (Array.isArray(d.tasks)) setTaskList(d.tasks);
+    } catch {}
+  };
+
+  const loadLinksFromApi = async () => {
+    try {
+      const res = await fetch(`${BACKEND}/api/admin/links`, { headers: getAuthHeaders() });
+      if (!res.ok) return;
+      const d = await res.json();
+      if (Array.isArray(d.links)) setLinksList(d.links);
+    } catch {}
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (pinInput.trim() === 'carbon2026' || pinInput.trim() === 'admin' || pinInput.trim() === 'tesla2026') {
-      setIsAuthenticated(true);
-      localStorage.setItem('carbondrop_admin_auth', 'true');
-      setLoginError('');
-      loadRealMinersFromSupabase();
-      loadConfigFromSupabase();
-      checkDatabaseHealth();
-    } else {
-      setLoginError('Invalid PIN code. Access denied.');
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: pinInput.trim() }),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setIsAuthenticated(true);
+        // store token for subsequent admin calls
+        localStorage.setItem('carbondrop_admin_token', data.token);
+        setLoginError('');
+        loadRealMinersFromSupabase();
+        loadConfigFromSupabase();
+        checkDatabaseHealth();
+      } else {
+        setLoginError(data.message || 'Invalid PIN code. Access denied.');
+      }
+    } catch (err) {
+      setLoginError('Login request failed.');
     }
   };
 
@@ -181,7 +256,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
         setPlayers(formatted);
         setStats((prev) => ({
           ...prev,
-          totalUsers: Math.max(data.length, 5702),
+          totalUsers: data.length,
         }));
       }
     } catch (err) {
@@ -319,8 +394,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
     setStats((prev) => ({
       ...prev,
       lastSent: new Date().toLocaleString(),
-      deliveredCount: 4596 + sent,
-      totalAudience: 5684 + recipients.length,
+      deliveredCount: prev.deliveredCount + sent,
+      totalAudience: recipients.length,
     }));
 
     setBroadcastStatusMessage(
@@ -487,9 +562,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
       });
     } catch {
       setHealthData({
-        status: 'ONLINE (FALLBACK)',
-        latencyMs: 28,
-        usersCount: 5702,
+        status: 'ERROR',
+        latencyMs: null,
+        usersCount: null,
         botUsername: BOT_USERNAME,
       });
     }
@@ -532,7 +607,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
               <div className="relative">
                 <input
                   type="password"
-                  placeholder="Enter PIN (e.g. carbon2026)"
+                  placeholder="Enter admin PIN"
                   value={pinInput}
                   onChange={(e) => setPinInput(e.target.value)}
                   className="w-full bg-[#161824] border border-[#282d42] rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors font-mono"
@@ -558,7 +633,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
 
           <div className="mt-6 pt-4 border-t border-[#1e2230] text-center">
             <span className="text-[11px] text-slate-500 font-mono">
-              Quick PIN: <code className="text-amber-400">carbon2026</code>
+              Authorized personnel only
             </span>
           </div>
         </div>
@@ -655,7 +730,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                     activeTab === 'users' ? 'bg-black/20 text-black' : 'bg-[#191c2b] text-indigo-300'
                   }`}
                 >
-                  {players.length || 5702}
+                  {players.length}
                 </span>
               </button>
 
