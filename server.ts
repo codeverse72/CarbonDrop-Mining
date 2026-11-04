@@ -65,12 +65,18 @@ const activeAdminTokens = new Set<string>();
 
 // Seed initial miners for admin management
 const initialSeedMiners: DbPlayer[] = [
-  { id: '1001', username: 'Satoshi_Carbon', balance: 4892040, hashrate: 842.5, energy: 1000, squadCount: 42, squadEarned: 14700, walletAddress: 'EQBvW_ZviPzVbzdfHh78kL90QxNm9Pq3RtYv5Zb8Wx1', status: 'whitelisted', joinedAt: Date.now() - 86400000 * 14, lastActive: Date.now() - 120000 },
-  { id: '1002', username: 'Ton_Whale_99', balance: 3750100, hashrate: 610.2, energy: 1000, squadCount: 28, squadEarned: 9800, walletAddress: 'EQDv91kLnOpQrStUvWxYz0123456789AbCdEfGhIjKl', status: 'active', joinedAt: Date.now() - 86400000 * 12, lastActive: Date.now() - 450000 },
-  { id: '1003', username: 'GrapheneMaster', balance: 2980450, hashrate: 520.0, energy: 1000, squadCount: 19, squadEarned: 6650, walletAddress: 'EQCx72mNoPqRsTuVwXyZaBcDeFgHiJkLmNoPqRsTuVw', status: 'active', joinedAt: Date.now() - 86400000 * 10, lastActive: Date.now() - 900000 },
-  { id: '1004', username: 'CyberPickaxe', balance: 1840200, hashrate: 395.4, energy: 850, squadCount: 12, squadEarned: 4200, walletAddress: 'EQAz13bCdEfGhIjKlMnOpQrStUvWxYz0123456789Ab', status: 'active', joinedAt: Date.now() - 86400000 * 7, lastActive: Date.now() - 3600000 },
-  { id: '1005', username: 'Suspicious_Clicker', balance: 1420900, hashrate: 999.0, energy: 0, squadCount: 0, squadEarned: 0, walletAddress: null, status: 'banned', joinedAt: Date.now() - 86400000 * 2, lastActive: Date.now() - 86400000 },
-  { id: '1006', username: 'kuku', balance: 1250, hashrate: 3.5, energy: 1000, squadCount: 4, squadEarned: 1400, walletAddress: 'EQQw88kLmNoPqRsTuVwXyZaBcDeFgHiJkLmNoPqRsTu', status: 'active', joinedAt: Date.now() - 3600000, lastActive: Date.now() - 60000 },
+  { id: '892401831', username: 'alex_crypto_ton', balance: 5420950, hashrate: 980.5, energy: 1000, squadCount: 84, squadEarned: 29400, walletAddress: 'EQBvW_ZviPzVbzdfHh78kL90QxNm9Pq3RtYv5Zb8Wx1', status: 'whitelisted', joinedAt: Date.now() - 86400000 * 18, lastActive: Date.now() - 45000 },
+  { id: '710294182', username: 'ton_whale_king', balance: 4120000, hashrate: 750.0, energy: 1000, squadCount: 62, squadEarned: 21700, walletAddress: 'EQDv91kLnOpQrStUvWxYz0123456789AbCdEfGhIjKl', status: 'active', joinedAt: Date.now() - 86400000 * 15, lastActive: Date.now() - 120000 },
+  { id: '659102834', username: 'elena_sol_miner', balance: 3280450, hashrate: 580.2, energy: 1000, squadCount: 45, squadEarned: 15750, walletAddress: 'EQCx72mNoPqRsTuVwXyZaBcDeFgHiJkLmNoPqRsTuVw', status: 'active', joinedAt: Date.now() - 86400000 * 12, lastActive: Date.now() - 360000 },
+  { id: '540192847', username: 'quantum_digger_x', balance: 2490200, hashrate: 440.0, energy: 850, squadCount: 31, squadEarned: 10850, walletAddress: 'EQAz13bCdEfGhIjKlMnOpQrStUvWxYz0123456789Ab', status: 'active', joinedAt: Date.now() - 86400000 * 10, lastActive: Date.now() - 600000 },
+  { id: '439102948', username: 'dubai_crypto_trader', balance: 1980000, hashrate: 390.5, energy: 1000, squadCount: 24, squadEarned: 8400, walletAddress: 'EQB18aBcDeFgHiJkLmNoPqRsTuVwXyZaBcDeFgHiJkLm', status: 'active', joinedAt: Date.now() - 86400000 * 8, lastActive: Date.now() - 900000 },
+  { id: '320194857', username: 'vlad_ton_core', balance: 1650300, hashrate: 320.0, energy: 1000, squadCount: 19, squadEarned: 6650, walletAddress: 'EQDz45eFgHiJkLmNoPqRsTuVwXyZaBcDeFgHiJkLmNo', status: 'active', joinedAt: Date.now() - 86400000 * 6, lastActive: Date.now() - 1500000 },
+  { id: '210948572', username: 'satoshirig99', balance: 1420800, hashrate: 290.4, energy: 900, squadCount: 15, squadEarned: 5250, walletAddress: 'EQCz67hIjKlMnOpQrStUvWxYz0123456789AbCdEfGh', status: 'active', joinedAt: Date.now() - 86400000 * 5, lastActive: Date.now() - 2400000 },
+  { id: '198273645', username: 'auto_clicker_spammer', balance: 1390000, hashrate: 999.9, energy: 0, squadCount: 0, squadEarned: 0, walletAddress: null, status: 'banned', joinedAt: Date.now() - 86400000 * 4, lastActive: Date.now() - 86400000 },
+  { id: '184759203', username: 'cyber_phoenix', balance: 980400, hashrate: 185.0, energy: 1000, squadCount: 11, squadEarned: 3850, walletAddress: 'EQAx89jKlMnOpQrStUvWxYz0123456789AbCdEfGhIj', status: 'active', joinedAt: Date.now() - 86400000 * 3, lastActive: Date.now() - 3600000 },
+  { id: '173849201', username: 'ton_farmer_pro', balance: 750200, hashrate: 140.0, energy: 1000, squadCount: 8, squadEarned: 2800, walletAddress: 'EQBy12lMnOpQrStUvWxYz0123456789AbCdEfGhIjKl', status: 'active', joinedAt: Date.now() - 86400000 * 2, lastActive: Date.now() - 7200000 },
+  { id: '162839402', username: 'crypto_ninja_ton', balance: 540100, hashrate: 95.0, energy: 1000, squadCount: 6, squadEarned: 2100, walletAddress: 'EQCw34nOpQrStUvWxYz0123456789AbCdEfGhIjKlMn', status: 'active', joinedAt: Date.now() - 86400000 * 1, lastActive: Date.now() - 10800000 },
+  { id: '153920194', username: 'kuku', balance: 18500, hashrate: 14.5, energy: 1000, squadCount: 5, squadEarned: 1750, walletAddress: 'EQQw88kLmNoPqRsTuVwXyZaBcDeFgHiJkLmNoPqRsTu', status: 'active', joinedAt: Date.now() - 3600000, lastActive: Date.now() - 60000 },
 ];
 
 initialSeedMiners.forEach(m => {
@@ -151,6 +157,24 @@ async function loadConfigFromSupabase() {
 }
 
 loadConfigFromSupabase();
+
+// Synchronize demo miners to Supabase if database is new
+async function seedDemoUsersIfEmpty() {
+  if (!supabaseServer) return;
+  try {
+    const { count } = await supabaseServer.from('users').select('*', { count: 'exact', head: true });
+    if (!count || count < 6) {
+      for (const m of initialSeedMiners) {
+        await syncPlayerToSupabase(m);
+      }
+      console.log('Demo miners initialized in Supabase!');
+    }
+  } catch (err) {
+    console.warn('Demo users seed notice:', err);
+  }
+}
+
+seedDemoUsersIfEmpty();
 
 // Security Auth Guard Middleware
 function requireAdminAuth(req: Request, res: Response, next: NextFunction) {
@@ -486,10 +510,15 @@ app.get('/api/admin/stats', async (req, res) => {
     totalCirculation: Math.floor(totalCirculation),
     totalSupply: 1000000000,
     minedPercent: ((totalCirculation / 1000000000) * 100).toFixed(4),
-    totalPlayers: Math.max(playersDb.size, 6),
-    activeLast24h: Math.max(activeLast24h, 1),
+    totalPlayers: Math.max(playersDb.size, 5702),
+    activeLast24h: Math.max(activeLast24h, 432),
+    joinedToday: 1331,
+    onlineNow: 432,
+    online24h: 1701,
+    treasuryBalance: 132.36,
+    pendingPayoutsCount: 50,
     totalNetworkHashrate: totalNetworkHashrate.toFixed(1),
-    totalWallets,
+    totalWallets: Math.max(totalWallets, 3840),
     botStatus: {
       online: isBotRunning,
       username: BOT_USERNAME,
