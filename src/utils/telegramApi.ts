@@ -51,3 +51,4 @@ export async function sendTelegramProof(channelUsername: string, text: string) {
     return { success: false, error: err.message };
   }
 }
+
