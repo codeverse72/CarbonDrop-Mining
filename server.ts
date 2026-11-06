@@ -565,10 +565,6 @@ app.get('/api/admin/stats', async (req, res) => {
     totalCirculation: Math.floor(totalCirculation),
     totalSupply: 1000000000,
     minedPercent: ((totalCirculation / 1000000000) * 100).toFixed(4),
-  res.json({
-    totalCirculation: Math.floor(totalCirculation),
-    totalSupply: 1000000000,
-    minedPercent: ((totalCirculation / 1000000000) * 100).toFixed(4),
     totalPlayers: playersDb.size,
     activeLast24h,
     joinedToday: 0,
@@ -578,13 +574,6 @@ app.get('/api/admin/stats', async (req, res) => {
     pendingPayoutsCount: withdrawalsDb.filter(w => w.status === 'Pending').length,
     totalNetworkHashrate: totalNetworkHashrate.toFixed(1),
     totalWallets,
-    botStatus: {
-      online: isBotRunning,
-      username: BOT_USERNAME,
-      broadcastsSent: broadcastHistory.length,
-    },
-    config: adminConfig,
-  });
     botStatus: {
       online: isBotRunning,
       username: BOT_USERNAME,

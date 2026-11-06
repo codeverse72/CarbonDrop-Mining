@@ -98,6 +98,7 @@ export interface UserStats {
   autoBotActiveUntil: number | null;
   activePlanId: string | null;
   activePlanExpiresAt: number | null;
+  telegramUsername?: string;
 }
 
 export interface AdminPlayer {
@@ -110,8 +111,12 @@ export interface AdminPlayer {
   walletAddress: string | null;
   status: 'active' | 'frozen' | 'whitelisted' | 'banned';
   joinedAt: number;
-  lastActive: number;
+  lastActive: number | string;
   activePlanId?: string | null;
+  telegramId: number;
+  firstName?: string;
+  carbBalance: number;
+  isBanned: boolean;
 }
 
 export interface AdminEconomyConfig {

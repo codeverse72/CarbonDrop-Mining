@@ -243,14 +243,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
 
       if (data && data.length > 0) {
         const formatted: AdminPlayer[] = data.map((u: any) => ({
+          id: String(u.telegram_id || u.id),
           telegramId: Number(u.telegram_id) || u.id,
           username: u.username || 'miner',
           firstName: u.username || 'Miner',
+          balance: Number(u.balance) || 0,
           carbBalance: Number(u.balance) || 0,
           hashrate: Number(u.hashrate) || 3.5,
+          energy: Number(u.energy) || 1000,
+          status: u.status || (u.isBanned ? 'banned' : 'active'),
           isBanned: u.status === 'banned',
           squadCount: u.squad_count || 0,
-          walletAddress: u.wallet_address || undefined,
+          walletAddress: u.wallet_address || null,
+          joinedAt: u.created_at ? new Date(u.created_at).getTime() : Date.now(),
           lastActive: u.updated_at ? new Date(u.updated_at).toLocaleTimeString() : 'Recently',
         }));
         setPlayers(formatted);
