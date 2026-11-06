@@ -1065,27 +1065,33 @@ app.post('/api/admin/broadcast', requireAdminAuth, async (req, res) => {
     } catch {}
   }
 
+  const totalAudience = playersDb.size;
+  const deliveredCount = successCount;
+  const blockedCount = Math.max(0, totalAudience - deliveredCount);
+  const deliveryRate = totalAudience > 0 ? Number(((deliveredCount / totalAudience) * 100).toFixed(1)) : 100;
+  const failureRate = totalAudience > 0 ? Number(((blockedCount / totalAudience) * 100).toFixed(1)) : 0;
+
   const broadcastRecord = {
     id: 'bc_' + Date.now(),
     message: String(message).trim(),
     sentAt: Date.now(),
-    recipientCount: 5684,
+    recipientCount: deliveredCount,
   };
   broadcastHistory.unshift(broadcastRecord);
 
-  broadcastSettings.deliveredCount = 4596;
-  broadcastSettings.blockedCount = 1088;
-  broadcastSettings.totalAudience = 5684;
-  broadcastSettings.deliveryRate = 80.9;
-  broadcastSettings.failureRate = 19.1;
+  broadcastSettings.deliveredCount = deliveredCount;
+  broadcastSettings.blockedCount = blockedCount;
+  broadcastSettings.totalAudience = totalAudience;
+  broadcastSettings.deliveryRate = deliveryRate;
+  broadcastSettings.failureRate = failureRate;
 
   res.json({
     success: true,
-    sentTo: 4596,
-    totalAudience: 5684,
-    deliveredCount: 4596,
-    blockedCount: 1088,
-    deliveryRate: 80.9,
+    sentTo: deliveredCount,
+    totalAudience,
+    deliveredCount,
+    blockedCount,
+    deliveryRate,
     broadcast: broadcastRecord,
   });
 });

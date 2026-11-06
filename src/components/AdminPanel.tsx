@@ -45,6 +45,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
     online24h: 0,
     treasuryBalance: 0,
     pendingPayouts: 0,
+    totalNetworkHashrate: '0.0',
+    totalCirculation: 0,
+    minedPercent: '0.0000',
     deliveredCount: 0,
     blockedCount: 0,
     totalAudience: 0,
@@ -121,9 +124,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('carbondrop_admin_token');
+    const pin = localStorage.getItem('carbondrop_admin_pin');
     return {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(pin ? { 'X-Admin-PIN': pin } : {}),
     };
   };
 
@@ -153,6 +158,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
         online24h: d.online24h ?? prev.online24h,
         treasuryBalance: d.treasuryBalance ?? prev.treasuryBalance,
         pendingPayouts: d.pendingPayoutsCount ?? prev.pendingPayouts,
+        totalNetworkHashrate: d.totalNetworkHashrate ?? prev.totalNetworkHashrate,
+        totalCirculation: d.totalCirculation ?? prev.totalCirculation,
+        minedPercent: d.minedPercent ?? prev.minedPercent,
         deliveredCount: d.broadcastStats?.deliveredCount ?? prev.deliveredCount,
         blockedCount: d.broadcastStats?.blockedCount ?? prev.blockedCount,
         totalAudience: d.broadcastStats?.totalAudience ?? prev.totalAudience,
@@ -207,27 +215,41 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const pin = pinInput.trim();
+    if (!pin) {
+      setLoginError('Please enter your admin PIN');
+      return;
+    }
     try {
-      const response = await fetch('/api/admin/login', {
+      // Connect to the backend with the user-configured PIN
+      const response = await fetch(`${BACKEND}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin: pinInput.trim() }),
+        body: JSON.stringify({ pin }),
       });
       const data = await response.json();
       if (response.ok && data.success) {
         setIsAuthenticated(true);
-        // store token for subsequent admin calls
+        localStorage.setItem('carbondrop_admin_auth', 'true');
         localStorage.setItem('carbondrop_admin_token', data.token);
+        localStorage.setItem('carbondrop_admin_pin', pin);
         setLoginError('');
-        loadRealMinersFromSupabase();
-        loadConfigFromSupabase();
+        loadAllDataFromApi();
         checkDatabaseHealth();
       } else {
         setLoginError(data.message || 'Invalid PIN code. Access denied.');
       }
     } catch (err) {
-      setLoginError('Login request failed.');
+      setLoginError('Cannot reach backend server. Check your connection.');
     }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('carbondrop_admin_auth');
+    localStorage.removeItem('carbondrop_admin_token');
+    localStorage.removeItem('carbondrop_admin_pin');
+    onClose();
   };
 
   // 1. Fetch Real Miners from Supabase
@@ -885,13 +907,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
             </div>
             <div className="text-right">
               <div className="text-[10px] text-slate-500 font-mono">VERIFIED MINERS</div>
-              <div className="text-sm font-extrabold text-white">{players.length || 5702}</div>
+              <div className="text-sm font-extrabold text-white">{players.length}</div>
             </div>
           </div>
 
           <button
             onClick={() => {
-              loadRealMinersFromSupabase();
+              loadAllDataFromApi();
               checkDatabaseHealth();
               setSyncToast('Refreshed all live database records');
               setTimeout(() => setSyncToast(null), 2500);
@@ -939,7 +961,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
             </button>
 
             <button
-              onClick={onClose}
+              onClick={handleLogout}
               className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-xs font-semibold text-red-400 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
@@ -957,7 +979,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
               <div className="text-[11px] font-mono uppercase text-slate-400 font-semibold">
                 TELEGRAM USERS
               </div>
-              <div className="text-2xl font-black text-white mt-1">{players.length || 5702}</div>
+              <div className="text-2xl font-black text-white mt-1">{players.length}</div>
               <div className="text-[11px] text-emerald-400/90 font-medium mt-2 flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                 Verified Telegram accounts
@@ -969,7 +991,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
               <div className="text-[11px] font-mono uppercase text-slate-400 font-semibold">
                 JOINED TODAY
               </div>
-              <div className="text-2xl font-black text-white mt-1">1,331</div>
+              <div className="text-2xl font-black text-white mt-1">{stats.joinedToday}</div>
               <div className="text-[11px] text-purple-400 font-medium mt-2 flex items-center gap-1">
                 <ArrowUpRight className="w-3 h-3 text-purple-400" />
                 New signups today
@@ -983,7 +1005,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                 ACTIVE / ONLINE
               </div>
               <div className="text-2xl font-black text-white mt-1">
-                432 <span className="text-xs text-slate-500 font-normal font-mono">(1701 online 24h)</span>
+                {stats.onlineActive} <span className="text-xs text-slate-500 font-normal font-mono">({stats.online24h} online 24h)</span>
               </div>
               <div className="text-[11px] text-teal-400 font-medium mt-2">Active mining sessions</div>
             </div>
@@ -1003,7 +1025,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                 PENDING PAYOUTS
               </div>
               <div className="text-2xl font-black text-rose-400 mt-1">
-                {withdrawals.filter((w) => w.status === 'Pending').length || 50}
+                {withdrawals.filter((w) => w.status === 'Pending').length}
               </div>
               <div className="text-[11px] text-rose-400/80 font-medium mt-2">Awaiting approval</div>
             </div>
@@ -2052,18 +2074,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="bg-[#141624] border border-[#22273a] rounded-xl p-4">
                   <div className="text-[10px] font-mono uppercase text-slate-400">Total Network Hashrate</div>
-                  <div className="text-2xl font-black text-cyan-400 mt-1">428.5 TH/s</div>
-                  <div className="text-[10px] text-emerald-400 mt-1">+12.4% past 24h</div>
+                  <div className="text-2xl font-black text-cyan-400 mt-1">{stats.totalNetworkHashrate} MH/s</div>
+                  <div className="text-[10px] text-emerald-400 mt-1">Live active hashrate</div>
                 </div>
                 <div className="bg-[#141624] border border-[#22273a] rounded-xl p-4">
                   <div className="text-[10px] font-mono uppercase text-slate-400">Lifetime Mined $CARB</div>
-                  <div className="text-2xl font-black text-amber-400 mt-1">1,842,910,240</div>
-                  <div className="text-[10px] text-slate-400 mt-1">Circulating supply: 48.2%</div>
+                  <div className="text-2xl font-black text-amber-400 mt-1">{stats.totalCirculation.toLocaleString()}</div>
+                  <div className="text-[10px] text-slate-400 mt-1">Circulating supply: {stats.minedPercent}%</div>
                 </div>
                 <div className="bg-[#141624] border border-[#22273a] rounded-xl p-4">
                   <div className="text-[10px] font-mono uppercase text-slate-400">Active Miners Right Now</div>
-                  <div className="text-2xl font-black text-white mt-1">432</div>
-                  <div className="text-[10px] text-teal-400 mt-1">1,701 online last 24h</div>
+                  <div className="text-2xl font-black text-white mt-1">{stats.onlineActive}</div>
+                  <div className="text-[10px] text-teal-400 mt-1">{stats.online24h} online last 24h</div>
                 </div>
               </div>
 
@@ -2080,7 +2102,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
                   </div>
                   <div className="bg-[#0f111a] p-3 rounded-lg border border-[#1e2233]">
                     <div className="text-[10px] text-slate-500">CHANNEL MIRROR</div>
-                    <div className="text-cyan-400 font-bold mt-1">SYNCED (#5874)</div>
+                    <div className="text-cyan-400 font-bold mt-1">{stats.lastSyncPostId ? `SYNCED (${stats.lastSyncPostId})` : 'IDLE'}</div>
                   </div>
                   <div className="bg-[#0f111a] p-3 rounded-lg border border-[#1e2233]">
                     <div className="text-[10px] text-slate-500">SSL SECURITY</div>
