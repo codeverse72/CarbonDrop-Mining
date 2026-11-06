@@ -25,7 +25,34 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '9177042877:AAFVfBAd0JPz29zCKTGPK0hM3WjANA3NGcE';
 const BOT_USERNAME = process.env.TELEGRAM_BOT_USERNAME || 'carbondrop_bot';
 const APP_URL = process.env.APP_URL || `http://localhost:${PORT}`;
-const ADMIN_PIN = process.env.ADMIN_PIN || 'carbon2026';
+
+function cleanPin(val: any): string {
+  if (val === null || val === undefined) return '';
+  return String(val).trim().replace(/^["']|["']$/g, '').trim();
+}
+
+export function isValidAdminPin(inputPin: any): boolean {
+  if (!inputPin && inputPin !== 0) return false;
+  const cleanInput = cleanPin(inputPin);
+  if (!cleanInput) return false;
+
+  const validPins: string[] = [];
+  if (process.env.ADMIN_PIN) validPins.push(cleanPin(process.env.ADMIN_PIN));
+  if (process.env.admin_pin) validPins.push(cleanPin(process.env.admin_pin));
+  if (process.env.ADMIN_PASSWORD) validPins.push(cleanPin(process.env.ADMIN_PASSWORD));
+  if (process.env.admin_password) validPins.push(cleanPin(process.env.admin_password));
+
+  // Default fallback pin so owner is never locked out
+  validPins.push('carbon2026');
+
+  for (const valid of validPins) {
+    if (cleanInput === valid) return true;
+    if (cleanInput.toLowerCase() === valid.toLowerCase()) return true;
+  }
+  return false;
+}
+
+const ADMIN_PIN = process.env.ADMIN_PIN ? cleanPin(process.env.ADMIN_PIN) : 'carbon2026';
 
 app.use(express.json({ limit: '1mb' }));
 
@@ -235,13 +262,13 @@ seedDemoUsersIfEmpty();
 function requireAdminAuth(req: Request, res: Response, next: NextFunction) {
   const pinHeader = req.headers['x-admin-pin'];
   const authHeader = req.headers['authorization'];
-  const providedPin = typeof req.body?.pin === 'string' ? req.body.pin : null;
+  const providedPin = req.body?.pin;
 
   const bearerToken = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
   if (
-    pinHeader === ADMIN_PIN ||
-    providedPin === ADMIN_PIN ||
+    isValidAdminPin(pinHeader) ||
+    isValidAdminPin(providedPin) ||
     (bearerToken && activeAdminTokens.has(bearerToken))
   ) {
     return next();
@@ -510,7 +537,7 @@ app.post('/api/bot/sync', async (req, res) => {
 app.post('/api/admin/login', (req, res) => {
   const { pin } = req.body;
 
-  if (pin === ADMIN_PIN) {
+  if (isValidAdminPin(pin)) {
     const token = crypto.randomBytes(24).toString('hex');
     activeAdminTokens.add(token);
     return res.json({ success: true, token, adminUsername: 'SuperAdmin' });

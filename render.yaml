@@ -19,4 +19,6 @@ services:
         sync: false
       - key: APP_URL
         sync: false
+      - key: ADMIN_PIN
+        sync: false
 
